@@ -37,6 +37,7 @@ func Test(url string, timeout time.Duration) bool {
 
 	select {
 	case <-time.After(timeout):
+		log.Println(url, "timed out")
 		return false
 	case s := <-status:
 		return s
