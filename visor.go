@@ -13,7 +13,7 @@ import (
 const (
 	testRate    = time.Second * 5
 	sendRate    = time.Minute * 10
-	testTimeout = time.Second * 2
+	testTimeout = time.Second * 5
 	testNumber  = "79197241488"
 )
 
