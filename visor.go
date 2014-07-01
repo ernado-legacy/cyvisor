@@ -19,7 +19,7 @@ const (
 
 var (
 	sites  = make(map[string]string)
-	key    = flag.String("key", "key", "sms.ru key")
+	key    = flag.String("key", "80df3a7d-4c8c-ffb4-b197-4dc850443bba", "sms.ru key")
 	group  = new(sync.WaitGroup)
 	client *gosmsru.Client
 )
@@ -46,19 +46,22 @@ func Test(url string, timeout time.Duration) bool {
 func TestLoop(name, url string) {
 	defer group.Done()
 	var lastSend time.Time
+	var lastStatus = true
 	t := time.NewTicker(testRate)
 	for _ = range t.C {
 		status := Test(url, testTimeout)
 		log.Println(name, status)
 		if !status && time.Now().Sub(lastSend) > sendRate {
-			log.Println("sending alert")
-			err := client.Send(testNumber, fmt.Sprintf("%s упал", name))
-			if err == nil {
-				lastSend = time.Now()
-			} else {
-				log.Println(err)
-			}
+			log.Println("sending down alert")
+			client.Send(testNumber, fmt.Sprintf("%s упал", name))
+			lastSend = time.Now()
 		}
+		if status && status != lastStatus {
+			log.Println("sending ok alert")
+			client.Send(testNumber, fmt.Sprintf("%s поднялся", name))
+			lastSend = time.Now()
+		}
+		lastStatus = status
 	}
 }
 
