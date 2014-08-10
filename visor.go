@@ -51,7 +51,9 @@ func TestLoop(name, url string) {
 	t := time.NewTicker(testRate)
 	for _ = range t.C {
 		status := Test(url, testTimeout)
-		log.Println(name, status)
+		if status != lastStatus {
+			log.Println(name, status)
+		}
 		if !status && time.Now().Sub(lastSend) > sendRate {
 			log.Println("sending down alert")
 			client.Send(testNumber, fmt.Sprintf("%s упал", name))
